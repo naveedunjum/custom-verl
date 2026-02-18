@@ -18,6 +18,9 @@ tensorflow/my_graph/*
 # C extensions
 *.so
 
+# Apptainer
+**/*.sif
+
 # Distribution / packaging
 .Python
 # env/
