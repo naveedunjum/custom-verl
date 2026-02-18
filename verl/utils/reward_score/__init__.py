@@ -14,6 +14,7 @@
 # from . import gsm8k, math, prime_math, prime_code
 
 from verl.utils.import_utils import deprecated
+from . import bleu_reward
 
 
 def default_compute_score(
@@ -102,6 +103,18 @@ def default_compute_score(
         from . import search_r1_like_qa_em
 
         res = search_r1_like_qa_em.compute_score(solution_str, ground_truth)
+    # MT Task
+    elif data_source in ["wmt22", "wmt23", "flores"]:
+        return bleu_reward.compute_score(
+            solution_str=solution_str,
+            ground_truth=ground_truth["tgt_text"],
+            lg_pair=ground_truth["lg"],
+            reward_type="continuous",
+            bleu_threshold=25.0,
+            scale_factor=100.0,
+            check_think=True,
+            format_reward=1.0,
+        )
 
     else:
         raise NotImplementedError(f"Reward function is not implemented for {data_source=}")
@@ -111,7 +124,7 @@ def default_compute_score(
     elif isinstance(res, int | float | bool):
         return float(res)
     else:
-        return float(res[0])
+        return float(res[1])
 
 
 @deprecated("verl.utils.reward_score.default_compute_score")
