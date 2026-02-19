@@ -1,12 +1,12 @@
 import re
 from sys import float_repr_style
-from typing import Optional, List, final
+from typing import Optional, List, final, Tuple
 import sacrebleu
 
-bleu = BLEU()
+bleu = sacrebleu.BLEU()
 
 
-def compute_bleu(lg_pair: str, ref: str, pred: str) -> :
+def compute_bleu(lg_pair: str, ref: str, pred: str) -> float:
     pred = pred if isinstance(pred, str) else ""
     tgt_lang = lg_pair.split("-")[1]
     if tgt_lang == "zh":
@@ -25,7 +25,7 @@ def compute_bleu(lg_pair: str, ref: str, pred: str) -> :
     return float(bleu_score)
 
 
-def extract_solution(solution_str: str) -> Tuple[Optional[str], str]:
+def extract_solution(solution_str: str) -> Tuple[str, str]:
     if "Assistant:" in solution_str:
         processed_str = solution_str.split(("Assistant:", 1))[1]
     elif "<|im_start|>assistant" in solution_str:
@@ -66,9 +66,9 @@ def validate_response_structure(processed_str: str) -> bool:
             validation_passed = False
 
     # verify tag order
-    if positions["think_start"] > positions["think_end"] or
+    if (positions["think_start"] > positions["think_end"] or
     positions["think_end"] > positions["answer_start"] or
-    positions["answer_start"] > positions["answer_end"]:
+    positions["answer_start"] > positions["answer_end"]):
         print(
             "  [Error] Incorrect tag order: Expected <think>...</think><answer>...</answer>")
         validation_passed = False
