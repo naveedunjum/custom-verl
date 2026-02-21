@@ -77,7 +77,7 @@ def validate_response_structure(processed_str: str) -> bool:
             else:
                 print("  Tag sequence validation passed")
 
-        return validation_passed
+    return validation_passed
 
 
 def compute_score(
