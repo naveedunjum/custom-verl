@@ -104,7 +104,7 @@ def default_compute_score(
 
         res = search_r1_like_qa_em.compute_score(solution_str, ground_truth)
     # MT Task
-    elif data_source.startswith(("wmt", "flores")):
+    elif data_source.startswith(("test_wmt", "wmt", "flores")):
         return bleu_reward.compute_score(
             data_source=data_source,
             solution_str=solution_str,
