@@ -15,6 +15,7 @@
 
 from verl.utils.import_utils import deprecated
 from . import bleu_reward
+from . import comet_rewards
 
 
 def default_compute_score(
@@ -105,12 +106,27 @@ def default_compute_score(
         res = search_r1_like_qa_em.compute_score(solution_str, ground_truth)
     # MT Task
     elif data_source.startswith(("test_wmt", "wmt", "flores")):
-        return bleu_reward.compute_score(
+        # BLEU rewards
+        # return bleu_reward.compute_score(
+        #    data_source=data_source,
+        #    solution_str=solution_str,
+        #    ground_truth=ground_truth,
+        #    extra_info=extra_info,
+        # )
+        # Comet Model rewards
+        return comet_rewards.compute_score(
             data_source=data_source,
             solution_str=solution_str,
             ground_truth=ground_truth,
             extra_info=extra_info,
         )
+        # Comet Free Model rewards
+        # return comet_rewards.compute_score_kiwi(
+        #    data_source=data_source,
+        #    solution_str=solution_str,
+        #    ground_truth=ground_truth,
+        #    extra_info=extra_info,
+        # )
     else:
         raise NotImplementedError(f"Reward function is not implemented for {data_source=}")
 
