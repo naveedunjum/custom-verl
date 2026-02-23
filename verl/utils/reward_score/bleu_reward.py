@@ -144,6 +144,8 @@ def compute_score(
 
         print("\n" + "-" * 80)
         print(" Reward Score ".center(80, "-"))
+        print(f"Ground Truth: {ground_truth}")
+        print(f"Answer text: {answer_text}")
         print(f"  Format : {format_score}")
         print(f"  Answer : {answer_score}")
         print(f"  Total  : {total_score}")

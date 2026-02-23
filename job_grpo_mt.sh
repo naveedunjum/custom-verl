@@ -25,7 +25,7 @@ export https_proxy=http://proxy.nhr.fau.de:80
 export SSL_CERT_FILE=../cacert.pem
 
 # --- Model ---
-MODEL_CHECKPOINT=Qwen/Qwen2.5-0.5B-Instruct
+MODEL_CHECKPOINT=Qwen/Qwen3-1.7B
 
 # --- Data ---
 train_file_path=/hnvme/workspace/slcl100h-vllm/custom-verl/data/train/parquet/train_base_enzh_zhen.parquet
@@ -92,4 +92,4 @@ apptainer exec --nv \
   trainer.default_hdfs_dir=null \
   trainer.save_freq=1000 \
   trainer.test_freq=200 \
-  trainer.total_epochs=1 $@ 2>&1 | tee ${exp_name}/grpo_bleu.log
+  trainer.total_epochs=5 $@ 2>&1 | tee ${exp_name}/grpo_bleu.log
