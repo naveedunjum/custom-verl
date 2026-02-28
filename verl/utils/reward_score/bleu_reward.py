@@ -2,7 +2,6 @@ import re
 from typing import Optional, Tuple
 import sacrebleu
 
-bleu = sacrebleu.BLEU()
 
 
 def compute_bleu(lg_pair: str, ref: str, pred: str) -> float:
@@ -17,7 +16,7 @@ def compute_bleu(lg_pair: str, ref: str, pred: str) -> float:
 
     refs = [[ref]]
     preds = [pred]
-    bleu_result_str = str(bleu.corpus_bleu(preds, refs, tokenize=tokenize))
+    bleu_result_str = str(sacrebleu.corpus_bleu(preds, refs, tokenize=tokenize))
     match = re.search(r"BLEU = (\d+\.\d+)", bleu_result_str)
     bleu_score = float(match.group(1)) if match else 0.0
 
@@ -34,8 +33,8 @@ def extract_solution(solution_str: str) -> Tuple[Optional[str], str]:
         processed_str = solution_str.split(
             "<|start_header_id|>assistant<|end_header_id|>", 1)[1]
     else:
-        print("[Error] Failed to locate model response header")
-        return None, solution_str
+        # Fallback: response may already start directly with content (e.g., <think>)
+        processed_str = solution_str
 
     answer_pattern = r"<translate>(.*?)</translate>"
     matches = list(re.finditer(answer_pattern, processed_str, re.DOTALL))
@@ -98,7 +97,7 @@ def compute_score(
     """
     try:
         extra_info = extra_info or {}
-        lg_pair = extra_info.get("lg_pair", "en-de")
+        lg_pair = extra_info.get("lg_pair", "en-zh")
         reward_type = extra_info.get("reward_type", "continuous")
         bleu_threshold = float(extra_info.get("bleu_threshold", 25.0))
         scale_factor = float(extra_info.get("scale_factor", 100.0))

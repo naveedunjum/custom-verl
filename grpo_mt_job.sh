@@ -9,6 +9,7 @@ CONTAINER_PATH=/hnvme/workspace/slcl100h-vllm/custom-verl/verl_vllm012.latest.si
 DOWNLOAD_DIR=/hnvme/workspace/slcl100h-vllm/hub/
 export HF_HOME=$DOWNLOAD_DIR
 mkdir -p $DOWNLOAD_DIR
+export HF_HUB_OFFLINE=1
 
 # --- Proxy ---
 export http_proxy=http://proxy.nhr.fau.de:80
@@ -28,9 +29,9 @@ rollout_num=8
 
 # --- Experiment naming ---
 datetime=$(date +"%Y%m%d_%H%M%S")
-WANDB_PROJECT_NAME="reinforce-learning"
-WANDB_RUN_NAME="grpo_bleu_${datetime}"
-exp_name="outputs/grpo_bleu_${datetime}"
+WANDB_PROJECT_NAME="custom-verl-learning"
+WANDB_RUN_NAME="mt_${datetime}"
+exp_name="outputs/mt_comet_${datetime}"
 mkdir -p $exp_name
 
 # --- Environment ---
@@ -75,12 +76,13 @@ apptainer exec --nv \
   algorithm.use_kl_in_reward=False \
   trainer.val_before_train=False \
   trainer.logger=['console','wandb'] \
-  trainer.project_name='MT-R1-Zero' \
+  trainer.project_name=${WANDB_PROJECT_NAME} \
   trainer.experiment_name=${exp_name} \
   trainer.n_gpus_per_node=4 \
   trainer.nnodes=1 \
   trainer.default_local_dir=${exp_name} \
   trainer.default_hdfs_dir=null \
-  trainer.save_freq=1000 \
-  trainer.test_freq=200 \
+  trainer.save_freq=50\
+  trainer.test_freq=50 \
+  reward.num_workers=2 \
   trainer.total_epochs=5 $@ 2>&1 | tee ${exp_name}/grpo_bleu.log

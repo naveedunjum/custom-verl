@@ -16,7 +16,7 @@ def _get_comet_model(model_path: str = "Unbabel/wmt22-comet-da"):
         import torch
         from comet import download_model, load_from_checkpoint
         _comet_model = load_from_checkpoint(download_model(model_path))
-        _comet_model = _comet_model.to(torch.cuda.current_device())
+        _comet_model = _comet_model.cpu()
     return _comet_model
 
 
@@ -26,7 +26,7 @@ def _get_cometkiwi_model(model_path: str = "Unbabel/wmt23-cometkiwi-da-xl"):
         import torch
         from comet import download_model, load_from_checkpoint
         _cometkiwi_model = load_from_checkpoint(download_model(model_path))
-        _cometkiwi_model = _cometkiwi_model.to(torch.cuda.current_device())
+        _cometkiwi_model = _cometkiwi_model.cpu()
     return _cometkiwi_model
 
 
@@ -43,13 +43,12 @@ def extract_solution(solution_str: str) -> Tuple[Optional[str], str]:
         processed_str = solution_str.split(
             "<|start_header_id|>assistant<|end_header_id|>", 1)[1]
     else:
-        print("[Error] Failed to locate model response header")
-        return None, solution_str
+        processed_str = solution_str
 
     answer_pattern = r"<translate>(.*?)</translate>"
     matches = list(re.finditer(answer_pattern, processed_str, re.DOTALL))
     if not matches:
-        print("[Error] No valid <translate> tag found")
+        print("[Warning] No valid <translate> tag found")
         return None, processed_str
 
     final_answer = matches[-1].group(1).strip()

@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=grpo_trainer
+#SBATCH --job-name=mt_log
 #SBATCH --nodes=1
 #SBATCH --cpus-per-task=8
 #SBATCH --partition=h100
@@ -23,9 +23,9 @@ mkdir -p $DOWNLOAD_DIR
 export http_proxy=http://proxy.nhr.fau.de:80
 export https_proxy=http://proxy.nhr.fau.de:80
 export SSL_CERT_FILE=../cacert.pem
-
+export HF_HUB_OFFLINE=1
 # --- Model ---
-MODEL_CHECKPOINT=Qwen/Qwen3-1.7B
+MODEL_CHECKPOINT=Qwen/Qwen3-4B
 
 # --- Data ---
 train_file_path=/hnvme/workspace/slcl100h-vllm/custom-verl/data/train/parquet/train_base_enzh_zhen.parquet
@@ -37,9 +37,9 @@ rollout_num=8
 
 # --- Experiment naming ---
 datetime=$(date +"%Y%m%d_%H%M%S")
-WANDB_PROJECT_NAME="reinforce-learning"
-WANDB_RUN_NAME="grpo_bleu_${datetime}"
-exp_name="outputs/grpo_bleu_${datetime}"
+WANDB_PROJECT_NAME="custom-verl-learning"
+WANDB_RUN_NAME="mt_${datetime}"
+exp_name="outputs/mt_comet${datetime}"
 mkdir -p $exp_name
 
 # --- Environment ---
@@ -84,12 +84,13 @@ apptainer exec --nv \
   algorithm.use_kl_in_reward=False \
   trainer.val_before_train=False \
   trainer.logger=['console','wandb'] \
-  trainer.project_name='MT-R1-Zero' \
+  trainer.project_name=${WANDB_PROJECT_NAME} \
   trainer.experiment_name=${exp_name} \
   trainer.n_gpus_per_node=4 \
   trainer.nnodes=1 \
   trainer.default_local_dir=${exp_name} \
   trainer.default_hdfs_dir=null \
-  trainer.save_freq=1000 \
-  trainer.test_freq=200 \
+  trainer.save_freq=50 \
+  trainer.test_freq=50 \
+  reward.num_workers=2 \
   trainer.total_epochs=5 $@ 2>&1 | tee ${exp_name}/grpo_bleu.log

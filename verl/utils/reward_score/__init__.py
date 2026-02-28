@@ -107,19 +107,19 @@ def default_compute_score(
     # MT Task
     elif data_source.startswith(("test_wmt", "wmt", "flores")):
         # BLEU rewards
-        # return bleu_reward.compute_score(
-        #    data_source=data_source,
-        #    solution_str=solution_str,
-        #    ground_truth=ground_truth,
-        #    extra_info=extra_info,
-        # )
-        # Comet Model rewards
+        #return bleu_reward.compute_score(
+        #   data_source=data_source,
+        #   solution_str=solution_str,
+        #   ground_truth=ground_truth,
+        #   extra_info=extra_info,
+        #)
+        ## Comet Model rewards
         return comet_rewards.compute_score(
-            data_source=data_source,
-            solution_str=solution_str,
-            ground_truth=ground_truth,
-            extra_info=extra_info,
-        )
+             data_source=data_source,
+             solution_str=solution_str,
+             ground_truth=ground_truth,
+             extra_info=extra_info,
+         )
         # Comet Free Model rewards
         # return comet_rewards.compute_score_kiwi(
         #    data_source=data_source,
