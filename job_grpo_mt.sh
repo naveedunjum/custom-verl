@@ -92,5 +92,5 @@ apptainer exec --nv \
   trainer.default_hdfs_dir=null \
   trainer.save_freq=50 \
   trainer.test_freq=50 \
-  reward.num_workers=2 \
+  reward.num_workers=4 \
   trainer.total_epochs=5 $@ 2>&1 | tee ${exp_name}/grpo_bleu.log

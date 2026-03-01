@@ -25,7 +25,7 @@ def _get_cometkiwi_model(model_path: str = "Unbabel/wmt23-cometkiwi-da-xl"):
     if _cometkiwi_model is None:
         import torch
         from comet import download_model, load_from_checkpoint
-        _cometkiwi_model = load_from_checkpoint(download_model(model_path))
+        _cometkiwi_model = load_from_checkpoint("/hnvme/workspace/slcl100h-vllm/custom-verl/comet_models/wmt22-cometkiwi-da/checkpoints/model.ckpt")
         _cometkiwi_model = _cometkiwi_model.cpu()
     return _cometkiwi_model
 
