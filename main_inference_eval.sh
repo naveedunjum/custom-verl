@@ -1,13 +1,18 @@
 #!/bin/bash
 
 # Main model settings
-export CUDA_VISIBLE_DEVICES=0,1
-BASE_MODEL_NAME="outputs/mt_comet20260228_231006" #set your model name
+export CUDA_VISIBLE_DEVICES=0,1,3,4
+# --- Proxy ---
+export http_proxy=http://proxy.nhr.fau.de:80
+export https_proxy=http://proxy.nhr.fau.de:80
+export SSL_CERT_FILE=../cacert.pem
+BASE_MODEL_NAME="Qwen/Qwen3-4B" #set your model name
+BASE_SAVE_DIR="./results"
 BASE_PATH="${BASE_MODEL_NAME}" # set your path
 MODELS=$BASE_MODEL_NAME
 MODEL_PATHS=$BASE_PATH
-comet_model_path=comet_models/wmt22-comet-da/checkpoints/model.ckpt #set your metric ckpt
-comet_free_model_path=comet_models/wmt22-cometkiwi-da/checkpoints/model.ckpt #set your metric ckpt
+comet_model_path=/hnvme/workspace/slcl100h-vllm/custom-verl/comet_models/wmt22-comet-da/checkpoints/model.ckpt
+comet_free_model_path=/hnvme/workspace/slcl100h-vllm/custom-verl/comet_models/wmt22-cometkiwi-da/checkpoints/model.ckpt
 
 TEMPLATE_TYPE="base"
 TENSOR_PARALLEL_SIZE=2
@@ -15,7 +20,6 @@ TEMPERATURE=0.2
 TOP_P=0.95
 MAX_TOKENS=1024
 BATCH_SIZE=16
-BASE_SAVE_DIR="./vllm_infer_results" #set your save dir
 INPUT_DIR=data/test/json
 
 # Language pair settings
@@ -26,7 +30,7 @@ all_language_pairs="en-zh zh-en" # You can add more, such as: en-zh zh-en de-zh 
 for i in "${!MODELS[@]}"; do
     MODEL_NAME="${MODELS[$i]}"
     MODEL_PATH="${MODEL_PATHS[$i]}"
-    SAVE_DIR="${BASE_SAVE_DIR}/${MODEL_NAME}"
+    SAVE_DIR="${BASE_SAVE_DIR}/$(basename ${MODEL_PATH})_${all_language_pairs// /_}"
     OUTPUT_FILE_PREFIX="$(basename ${MODEL_NAME})"
     
     echo "Processing model: ${MODEL_NAME}"
@@ -120,41 +124,10 @@ for i in "${!MODELS[@]}"; do
         cat "${output_path}.bleu"
         
         # Calculate COMET score
-        python3 -c "
-import sys
-from comet import download_model, load_from_checkpoint
-
-model_path = '${comet_model_path}'
-model = load_from_checkpoint(model_path)
-
-with open('${src_path}', 'r') as f:
-    sources = [line.strip() for line in f]
-with open('${output_path}', 'r') as f:
-    translations = [line.strip() for line in f]
-with open('${tgt_path}', 'r') as f:
-    references = [line.strip() for line in f]
-
-data = [{'src': s, 'mt': t, 'ref': r} for s, t, r in zip(sources, translations, references)]
-output = model.predict(data, batch_size=64, gpus=1)
-print(output)
-" > "${output_path}.comet" 2>&1 || echo "COMET scoring failed"
-
-        python3 -c "
-import sys
-from comet import download_model, load_from_checkpoint
-
-model_path = '${comet_free_model_path}'
-model = load_from_checkpoint(model_path)
-
-with open('${src_path}', 'r') as f:
-    sources = [line.strip() for line in f]
-with open('${output_path}', 'r') as f:
-    translations = [line.strip() for line in f]
-
-data = [{'src': s, 'mt': t} for s, t in zip(sources, translations)]
-output = model.predict(data, batch_size=64, gpus=1)
-print(output)
-" > "${output_path}.cometkiwi" 2>&1 || echo "COMET-kiwi scoring failed"
+        echo "Calculating COMET scores..."
+        python3 eval/comet_sc.py ${comet_model_path} "${src_path}" "${output_path}" "${tgt_path}" > "${output_path}.comet" || echo "COMET scoring failed"
+        echo "Calculating COMET Kiwi scores..."
+        python3 eval/comet_sc.py ${comet_free_model_path} "${src_path}" "${output_path}" > "${output_path}.cometkiwi" || echo "COMET-kiwi scoring failed"
         
         echo "---------------------------${src}-${tgt} (${MODEL_NAME})-------------------------------"
         cat "${output_path}.bleu"

@@ -3,7 +3,7 @@
 #SBATCH --nodes=1
 #SBATCH --cpus-per-task=8
 #SBATCH --partition=h100
-#SBATCH --time=04:00:00
+#SBATCH --time=12:00:00
 #SBATCH --export=NONE
 #SBATCH --gres=gpu:h100:4
 
@@ -28,18 +28,17 @@ export HF_HUB_OFFLINE=1
 MODEL_CHECKPOINT=Qwen/Qwen3-4B
 
 # --- Data ---
-train_file_path=/hnvme/workspace/slcl100h-vllm/custom-verl/data/train/parquet/train_base_enzh_zhen.parquet
-test_file_path=/hnvme/workspace/slcl100h-vllm/custom-verl/data/test/parquet/test_base_enzh_zhen.parquet
-
+train_file_path=/hnvme/workspace/slcl100h-vllm/custom-verl/data/train/parquet/train_base_enur_enks.parquet
+test_file_path=/hnvme/workspace/slcl100h-vllm/custom-verl/data/test/parquet/test_base_enur_enks.parquet
 # --- Training hyperparameters ---
-train_batch_size=256
+train_batch_size=16
 rollout_num=8
 
 # --- Experiment naming ---
 datetime=$(date +"%Y%m%d_%H%M%S")
-WANDB_PROJECT_NAME="custom-verl-learning"
-WANDB_RUN_NAME="mt_${datetime}"
-exp_name="outputs/mt_comet${datetime}"
+WANDB_PROJECT_NAME="VERL-Experiments"
+WANDB_RUN_NAME="mt_$qwen_ks_ur{datetime}"
+exp_name="outputs/mt_comet_qwen_ks_ur${datetime}"
 mkdir -p $exp_name
 
 # --- Environment ---
@@ -61,27 +60,27 @@ apptainer exec --nv \
   data.max_prompt_length=512 \
   data.max_response_length=1024 \
   actor_rollout_ref.model.path=${MODEL_CHECKPOINT} \
-  actor_rollout_ref.actor.optim.lr=5e-7 \ # Same 
-  actor_rollout_ref.model.use_remove_padding=True \  # Same
-  actor_rollout_ref.actor.ppo_mini_batch_size=64 \  # 256 in orig
-  actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu=64 \  # 256, but not per gpu
-  actor_rollout_ref.actor.use_kl_loss=False \  # Same
-  actor_rollout_ref.actor.kl_loss_coef=0.01 \  # Same 
-  actor_rollout_ref.actor.entropy_coeff=0.0 \  # same 
-  actor_rollout_ref.actor.kl_loss_type=low_var_kl \  # same
-  actor_rollout_ref.model.enable_gradient_checkpointing=True \  # same
-  actor_rollout_ref.actor.fsdp_config.param_offload=True \  #  same  
-  +actor_rollout_ref.actor.fsdp_config.grad_offload=True \  # same
-  actor_rollout_ref.actor.fsdp_config.optimizer_offload=True \  # same
-  actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=32 \  # 128, but not per gpu
+  actor_rollout_ref.actor.optim.lr=5e-7 \
+  actor_rollout_ref.model.use_remove_padding=True \
+  actor_rollout_ref.actor.ppo_mini_batch_size=16 \
+  actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu=32 \
+  actor_rollout_ref.actor.use_kl_loss=False \
+  actor_rollout_ref.actor.kl_loss_coef=0.01 \
+  actor_rollout_ref.actor.entropy_coeff=0.0 \
+  actor_rollout_ref.actor.kl_loss_type=low_var_kl \
+  actor_rollout_ref.model.enable_gradient_checkpointing=True \
+  actor_rollout_ref.actor.fsdp_config.param_offload=True \
+  +actor_rollout_ref.actor.fsdp_config.grad_offload=True \
+  actor_rollout_ref.actor.fsdp_config.optimizer_offload=True \
+  actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=32 \
   actor_rollout_ref.rollout.tensor_model_parallel_size=1 \
   actor_rollout_ref.rollout.name=vllm \
   actor_rollout_ref.rollout.gpu_memory_utilization=0.7 \
-  actor_rollout_ref.rollout.n=${rollout_num} \ # 8
-  actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=32 \  # 128, but not per gpu
-  actor_rollout_ref.ref.fsdp_config.param_offload=True \  # same
-  algorithm.kl_ctrl.kl_coef=0.0 \  # same
-  algorithm.use_kl_in_reward=False \  # missing in orig
+  actor_rollout_ref.rollout.n=${rollout_num} \
+  actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=32 \
+  actor_rollout_ref.ref.fsdp_config.param_offload=True \
+  algorithm.kl_ctrl.kl_coef=0.0 \
+  algorithm.use_kl_in_reward=False \
   trainer.val_before_train=False \
   trainer.logger=['console','wandb'] \
   trainer.project_name=${WANDB_PROJECT_NAME} \
@@ -90,7 +89,7 @@ apptainer exec --nv \
   trainer.nnodes=1 \
   trainer.default_local_dir=${exp_name} \
   trainer.default_hdfs_dir=null \
-  trainer.save_freq=50 \
+  trainer.save_freq=200 \
   trainer.test_freq=50 \
-  reward.num_workers=4 \
-  trainer.total_epochs=5 $@ 2>&1 | tee ${exp_name}/grpo_bleu.log
+  reward.num_workers=2 \
+  trainer.total_epochs=2 $@ 2>&1 | tee ${exp_name}/grpo_bleu.log

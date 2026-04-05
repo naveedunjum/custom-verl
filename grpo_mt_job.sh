@@ -9,7 +9,7 @@ CONTAINER_PATH=/hnvme/workspace/slcl100h-vllm/custom-verl/verl_vllm012.latest.si
 DOWNLOAD_DIR=/hnvme/workspace/slcl100h-vllm/hub/
 export HF_HOME=$DOWNLOAD_DIR
 mkdir -p $DOWNLOAD_DIR
-export HF_HUB_OFFLINE=1
+# export HF_HUB_OFFLINE=1
 
 # --- Proxy ---
 export http_proxy=http://proxy.nhr.fau.de:80
@@ -17,14 +17,14 @@ export https_proxy=http://proxy.nhr.fau.de:80
 export SSL_CERT_FILE=../cacert.pem
 
 # --- Model ---
-MODEL_CHECKPOINT=Qwen/Qwen3-1.7B
+MODEL_CHECKPOINT=Qwen/Qwen3-4B
 
 # --- Data ---
-train_file_path=/hnvme/workspace/slcl100h-vllm/custom-verl/data/train/parquet/train_base_enzh_zhen.parquet
-test_file_path=/hnvme/workspace/slcl100h-vllm/custom-verl/data/test/parquet/test_base_enzh_zhen.parquet
+train_file_path=/hnvme/workspace/slcl100h-vllm/custom-verl/data/train/parquet/train_base_enur.parquet
+test_file_path=/hnvme/workspace/slcl100h-vllm/custom-verl/data/test/parquet/test_base_enur.parquet
 
 # --- Training hyperparameters ---
-train_batch_size=256
+train_batch_size=16
 rollout_num=8
 
 # --- Experiment naming ---
@@ -56,7 +56,7 @@ apptainer exec --nv \
   actor_rollout_ref.actor.optim.lr=5e-7 \
   actor_rollout_ref.model.use_remove_padding=True \
   actor_rollout_ref.actor.ppo_mini_batch_size=16 \
-  actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu=4 \
+  actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu=32 \
   actor_rollout_ref.actor.use_kl_loss=False \
   actor_rollout_ref.actor.kl_loss_coef=0.01 \
   actor_rollout_ref.actor.entropy_coeff=0.0 \
@@ -65,12 +65,12 @@ apptainer exec --nv \
   actor_rollout_ref.actor.fsdp_config.param_offload=True \
   +actor_rollout_ref.actor.fsdp_config.grad_offload=True \
   actor_rollout_ref.actor.fsdp_config.optimizer_offload=True \
-  actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=4 \
+  actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=32 \
   actor_rollout_ref.rollout.tensor_model_parallel_size=1 \
   actor_rollout_ref.rollout.name=vllm \
-  actor_rollout_ref.rollout.gpu_memory_utilization=0.7 \
+  actor_rollout_ref.rollout.gpu_memory_utilization=0.6 \
   actor_rollout_ref.rollout.n=${rollout_num} \
-  actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=4 \
+  actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=32 \
   actor_rollout_ref.ref.fsdp_config.param_offload=True \
   algorithm.kl_ctrl.kl_coef=0.0 \
   algorithm.use_kl_in_reward=False \
@@ -82,7 +82,7 @@ apptainer exec --nv \
   trainer.nnodes=1 \
   trainer.default_local_dir=${exp_name} \
   trainer.default_hdfs_dir=null \
-  trainer.save_freq=50\
+  trainer.save_freq=100 \
   trainer.test_freq=50 \
   reward.num_workers=2 \
-  trainer.total_epochs=5 $@ 2>&1 | tee ${exp_name}/grpo_bleu.log
+  trainer.total_epochs=2 $@ 2>&1 | tee ${exp_name}/grpo_bleu.log

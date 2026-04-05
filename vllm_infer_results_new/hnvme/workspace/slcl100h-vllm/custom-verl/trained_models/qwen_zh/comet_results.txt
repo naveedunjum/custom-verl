@@ -1,0 +1,2 @@
+qwen_zh-zh-en: 'torch'
+qwen_zh-en-zh: 'torch'

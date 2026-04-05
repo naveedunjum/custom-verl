@@ -105,7 +105,7 @@ def default_compute_score(
 
         res = search_r1_like_qa_em.compute_score(solution_str, ground_truth)
     # MT Task
-    elif data_source.startswith(("test_wmt", "wmt", "flores")):
+    elif data_source.startswith(("test_wmt", "wmt", "flores", "NLLB")):
         # BLEU rewards
         #return bleu_reward.compute_score(
         #   data_source=data_source,
@@ -114,19 +114,19 @@ def default_compute_score(
         #   extra_info=extra_info,
         #)
         ## Comet Model rewards
-        # return comet_rewards.compute_score(
-        #      data_source=data_source,
-        #      solution_str=solution_str,
-        #      ground_truth=ground_truth,
-        #      extra_info=extra_info,
-        #  )
+        return comet_rewards.compute_score(
+             data_source=data_source,
+             solution_str=solution_str,
+             ground_truth=ground_truth,
+             extra_info=extra_info,
+         )
         # Comet Free Model rewards
-        return comet_rewards.compute_score_kiwi(
-           data_source=data_source,
-           solution_str=solution_str,
-           ground_truth=ground_truth,
-           extra_info=extra_info,
-        )
+        # return comet_rewards.compute_score_kiwi(
+        #    data_source=data_source,
+        #    solution_str=solution_str,
+        #    ground_truth=ground_truth,
+        #    extra_info=extra_info,
+        # )
     else:
         raise NotImplementedError(f"Reward function is not implemented for {data_source=}")
 

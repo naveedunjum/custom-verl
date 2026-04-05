@@ -1,0 +1,3 @@
+/home/hpc/slcl/slcl100h/.local/lib/python3.12/site-packages/torchmetrics/utilities/imports.py:23: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import DistributionNotFound, get_distribution
+Lightning automatically upgraded your loaded checkpoint from v1.8.2 to v2.6.1. To apply the upgrade to your files permanently, run `python -m pytorch_lightning.utilities.upgrade_checkpoint comet_models/wmt22-cometkiwi-da/checkpoints/model.ckpt`

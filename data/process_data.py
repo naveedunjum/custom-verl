@@ -13,6 +13,8 @@ language_map = {
     'de': 'German',
     'zh': 'Chinese',
     'ja': 'Japanese',
+    'ur': 'Urdu',
+    'ks': 'Kashmiri',
 }
 
 def make_prefix(example, template_type, tokenizer):

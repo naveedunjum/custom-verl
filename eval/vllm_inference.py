@@ -16,6 +16,7 @@ language_map = {
     'de': 'German',
     'zh': 'Chinese',
     'ja': 'Japanese',
+    'ur': 'Urdu',
 }
 
 def load_jsonl_file(file_path):

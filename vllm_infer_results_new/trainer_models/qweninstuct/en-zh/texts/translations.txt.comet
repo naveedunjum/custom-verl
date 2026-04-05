@@ -1,0 +1,8 @@
+/home/hpc/slcl/slcl100h/.local/lib/python3.12/site-packages/torchmetrics/utilities/imports.py:23: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import DistributionNotFound, get_distribution
+Lightning automatically upgraded your loaded checkpoint from v1.8.3.post1 to v2.6.1. To apply the upgrade to your files permanently, run `python -m pytorch_lightning.utilities.upgrade_checkpoint comet_models/wmt22-comet-da/checkpoints/model.ckpt`
+Encoder model frozen.
+/home/hpc/slcl/slcl100h/.local/lib/python3.12/site-packages/pytorch_lightning/core/saving.py:197: Found keys that are not in the model state dict but in the checkpoint: ['encoder.model.embeddings.position_ids']
+Traceback (most recent call last):
+  File "<string>", line 8, in <module>
+FileNotFoundError: [Errno 2] No such file or directory: './vllm_infer_results_new/trainer_models/qweninstuct/en-zh/texts/all_source.txt'

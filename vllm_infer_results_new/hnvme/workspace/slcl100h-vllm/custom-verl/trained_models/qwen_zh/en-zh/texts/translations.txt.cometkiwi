@@ -1,0 +1,61 @@
+/home/hpc/slcl/slcl100h/.local/lib/python3.12/site-packages/torchmetrics/utilities/imports.py:23: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import DistributionNotFound, get_distribution
+Lightning automatically upgraded your loaded checkpoint from v1.8.2 to v2.6.1. To apply the upgrade to your files permanently, run `python -m pytorch_lightning.utilities.upgrade_checkpoint comet_models/wmt22-cometkiwi-da/checkpoints/model.ckpt`
+Traceback (most recent call last):
+  File "/home/hpc/slcl/slcl100h/.local/lib/python3.12/site-packages/transformers/tokenization_utils_base.py", line 2076, in from_pretrained
+    resolved_vocab_files[file_id] = cached_file(
+                                    ^^^^^^^^^^^^
+  File "/home/hpc/slcl/slcl100h/.local/lib/python3.12/site-packages/transformers/utils/hub.py", line 322, in cached_file
+    file = cached_files(path_or_repo_id=path_or_repo_id, filenames=[filename], **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/slcl/slcl100h/.local/lib/python3.12/site-packages/transformers/utils/hub.py", line 567, in cached_files
+    raise e
+  File "/home/hpc/slcl/slcl100h/.local/lib/python3.12/site-packages/transformers/utils/hub.py", line 479, in cached_files
+    hf_hub_download(
+  File "/usr/local/lib/python3.12/dist-packages/huggingface_hub/utils/_validators.py", line 114, in _inner_fn
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/huggingface_hub/file_download.py", line 1007, in hf_hub_download
+    return _hf_hub_download_to_cache_dir(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/huggingface_hub/file_download.py", line 1168, in _hf_hub_download_to_cache_dir
+    _download_to_tmp_and_move(
+  File "/usr/local/lib/python3.12/dist-packages/huggingface_hub/file_download.py", line 1720, in _download_to_tmp_and_move
+    xet_get(
+  File "/usr/local/lib/python3.12/dist-packages/huggingface_hub/file_download.py", line 626, in xet_get
+    download_files(
+RuntimeError: Data processing error: CAS service error : ReqwestMiddleware Error: Request failed after 5 retries
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+  File "/home/hpc/slcl/slcl100h/.local/lib/python3.12/site-packages/comet/models/__init__.py", line 120, in load_from_checkpoint
+    model = model_class.load_from_checkpoint(**kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/slcl/slcl100h/.local/lib/python3.12/site-packages/pytorch_lightning/utilities/model_helpers.py", line 130, in wrapper
+    return self.method(cls_type, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/slcl/slcl100h/.local/lib/python3.12/site-packages/pytorch_lightning/core/module.py", line 1797, in load_from_checkpoint
+    loaded = _load_from_checkpoint(
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/slcl/slcl100h/.local/lib/python3.12/site-packages/pytorch_lightning/core/saving.py", line 93, in _load_from_checkpoint
+    model = _load_state(cls, checkpoint, strict=strict, **kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/slcl/slcl100h/.local/lib/python3.12/site-packages/pytorch_lightning/core/saving.py", line 167, in _load_state
+    obj = instantiator(cls, _cls_kwargs) if instantiator else cls(**_cls_kwargs)
+                                                              ^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/slcl/slcl100h/.local/lib/python3.12/site-packages/comet/models/multitask/unified_metric.py", line 126, in __init__
+    super().__init__(
+  File "/home/hpc/slcl/slcl100h/.local/lib/python3.12/site-packages/comet/models/base.py", line 121, in __init__
+    self.encoder = str2encoder[self.hparams.encoder_model].from_pretrained(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/slcl/slcl100h/.local/lib/python3.12/site-packages/comet/encoders/xlmr.py", line 90, in from_pretrained
+    return XLMREncoder(pretrained_model, load_pretrained_weights, local_files_only)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/slcl/slcl100h/.local/lib/python3.12/site-packages/comet/encoders/xlmr.py", line 46, in __init__
+    self.tokenizer = XLMRobertaTokenizerFast.from_pretrained(
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/slcl/slcl100h/.local/lib/python3.12/site-packages/transformers/tokenization_utils_base.py", line 2096, in from_pretrained
+    raise OSError(
+OSError: Can't load tokenizer for 'microsoft/infoxlm-large'. If you were trying to load it from 'https://huggingface.co/models', make sure you don't have a local directory with the same name. Otherwise, make sure 'microsoft/infoxlm-large' is the correct path to a directory containing all relevant files for a XLMRobertaTokenizerFast tokenizer.
