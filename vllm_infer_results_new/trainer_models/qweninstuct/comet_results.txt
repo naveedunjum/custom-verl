@@ -1,2 +1,0 @@
-qweninstuct-zh-en: './vllm_infer_results_new/trainer_models/qweninstuct/zh-en/texts/all_source.txt'
-qweninstuct-en-zh: './vllm_infer_results_new/trainer_models/qweninstuct/en-zh/texts/all_source.txt'
